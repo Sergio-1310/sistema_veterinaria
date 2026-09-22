@@ -1,53 +1,39 @@
 package com.example.huellitasVet.service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
 import com.example.huellitasVet.model.Cita;
+import com.example.huellitasVet.repository.CitaRepository;
 
 @Service
 public class CitaServiceImpl implements CitaService {
 
-    private final List<Cita> citas = new ArrayList<>();
-    private Long siguienteId = 1L;
+    private final CitaRepository citaRepository;
 
-    public CitaServiceImpl() {
-
-        citas.add(new Cita(
-                siguienteId++,
-                1L,
-                "2026-09-10",
-                "10:00",
-                "Consulta general",
-                "PENDIENTE"));
+    public CitaServiceImpl(CitaRepository citaRepository) {
+        this.citaRepository = citaRepository;
     }
 
     @Override
     public List<Cita> listar() {
-        return citas;
+        return citaRepository.findAll();
     }
 
     @Override
     public Cita buscarPorId(Long id) {
-        return citas.stream()
-                .filter(c -> c.getId().equals(id))
-                .findFirst()
-                .orElse(null);
+        return citaRepository.findById(id).orElse(null);
     }
 
     @Override
     public Cita registrar(Cita cita) {
-        cita.setId(siguienteId++);
 
         if (cita.getEstado() == null) {
             cita.setEstado("PENDIENTE");
         }
 
-        citas.add(cita);
-
-        return cita;
+        return citaRepository.save(cita);
     }
 
     @Override
@@ -65,12 +51,17 @@ public class CitaServiceImpl implements CitaService {
         existente.setMotivo(cita.getMotivo());
         existente.setEstado(cita.getEstado());
 
-        return existente;
+        return citaRepository.save(existente);
     }
 
     @Override
     public boolean eliminar(Long id) {
-        return citas.removeIf(
-                cita -> cita.getId().equals(id));
+
+        if (!citaRepository.existsById(id)) {
+            return false;
+        }
+
+        citaRepository.deleteById(id);
+        return true;
     }
 }

@@ -1,55 +1,34 @@
 package com.example.huellitasVet.service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
 import com.example.huellitasVet.model.Mascota;
+import com.example.huellitasVet.repository.MascotaRepository;
 
 @Service
 public class MascotaServiceImpl implements MascotaService {
 
-    private final List<Mascota> mascotas = new ArrayList<>();
-    private Long siguienteId = 1L;
+    private final MascotaRepository mascotaRepository;
 
-    public MascotaServiceImpl() {
-
-        mascotas.add(new Mascota(
-                siguienteId++,
-                "Max",
-                "Perro",
-                "Labrador",
-                4,
-                "Carlos Pérez"));
-
-        mascotas.add(new Mascota(
-                siguienteId++,
-                "Luna",
-                "Gato",
-                "Siamés",
-                2,
-                "Ana Torres"));
+    public MascotaServiceImpl(MascotaRepository mascotaRepository) {
+        this.mascotaRepository = mascotaRepository;
     }
 
     @Override
     public List<Mascota> listar() {
-        return mascotas;
+        return mascotaRepository.findAll();
     }
 
     @Override
     public Mascota buscarPorId(Long id) {
-        return mascotas.stream()
-                .filter(m -> m.getId().equals(id))
-                .findFirst()
-                .orElse(null);
+        return mascotaRepository.findById(id).orElse(null);
     }
 
     @Override
     public Mascota registrar(Mascota mascota) {
-        mascota.setId(siguienteId++);
-        mascotas.add(mascota);
-        return mascota;
+        return mascotaRepository.save(mascota);
     }
 
     @Override
@@ -67,12 +46,17 @@ public class MascotaServiceImpl implements MascotaService {
         existente.setEdad(mascota.getEdad());
         existente.setNombrePropietario(mascota.getNombrePropietario());
 
-        return existente;
+        return mascotaRepository.save(existente);
     }
 
     @Override
     public boolean eliminar(Long id) {
-        return mascotas.removeIf(
-                mascota -> mascota.getId().equals(id));
+
+        if (!mascotaRepository.existsById(id)) {
+            return false;
+        }
+
+        mascotaRepository.deleteById(id);
+        return true;
     }
 }

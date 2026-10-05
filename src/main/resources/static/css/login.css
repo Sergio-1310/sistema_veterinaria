@@ -1,0 +1,140 @@
+body,
+html {
+    height: 100%;
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: #f8f9fa;
+}
+
+/* Panel Izquierdo con Gradiente */
+.brand-panel {
+    background: linear-gradient(135deg, #2b7a78 0%, #172a3a 100%);
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 3rem 2rem;
+    text-align: center;
+}
+
+/* Icono de Huella con Contenedor Translúcido */
+.icon-box {
+    width: 80px;
+    height: 80px;
+    background-color: rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem auto;
+    backdrop-filter: blur(5px);
+}
+
+.icon-box i {
+    font-size: 2.5rem;
+    color: #ffffff;
+}
+
+/* Lista de características */
+.features-list {
+    list-style: none;
+    padding: 0;
+    text-align: left;
+    display: inline-block;
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.features-list li {
+    margin-bottom: 0.5rem;
+}
+
+.features-list li::before {
+    content: "•";
+    margin-right: 8px;
+    color: #ffffff;
+}
+
+/* Formulario y Tarjeta en Panel Derecho */
+.form-panel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 420px;
+    padding: 2.5rem;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    border: none;
+}
+
+/* Estilos de Botón y Controles */
+.btn-brand {
+    background-color: #1a8a83;
+    color: #ffffff;
+    border: none;
+    padding: 0.75rem;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.btn-brand:hover {
+    background-color: #146c67;
+    color: #ffffff;
+}
+
+.form-control {
+    padding: 0.65rem 0.9rem;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    font-size: 0.9rem;
+}
+
+.form-control:focus {
+    border-color: #1a8a83;
+    box-shadow: 0 0 0 0.25rem rgba(26, 138, 131, 0.15);
+}
+
+.form-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.3rem;
+}
+
+.password-container {
+    position: relative;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.brand-footer {
+    font-size: 0.75rem;
+    opacity: 0.6;
+}
+
+.link-brand {
+    color: #1a8a83;
+    text-decoration: none;
+    font-size: 0.85rem;
+}
+
+.link-brand:hover {
+    text-decoration: underline;
+}

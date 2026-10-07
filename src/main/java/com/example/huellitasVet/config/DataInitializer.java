@@ -1,7 +1,7 @@
 package com.example.huellitasVet.config;
 
-import com.example.huellitasVet.model.Usuario; // Adapta a tu entidad
-import com.example.huellitasVet.repository.UsuarioRepository; // Adapta a tu repositorio
+import com.example.huellitasVet.model.Usuario;
+import com.example.huellitasVet.repository.UsuarioRepository;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import com.example.huellitasVet.model.Mascota;
 import com.example.huellitasVet.service.MascotaService;
 
+
 @RestController
 @RequestMapping("/api/mascotas")
 public class MascotaController {

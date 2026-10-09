@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Propietarios - HuellitasVet</title>
+
+    <!-- Hojas de Estilo Externas -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- CSS Propio desde static/css/propietarios.css -->
+    <link rel="stylesheet" th:href="@{/css/propietarios.css}">
+</head>
+
+<body>
+
+    <!-- Sidebar Lateral -->
+    <aside class="sidebar">
+        <div>
+            <!-- Brand Logo -->
+            <div class="sidebar-brand">
+                <div class="brand-icon">
+                    <i class="fa-solid fa-paw fs-4 text-white"></i>
+                </div>
+                <div>
+                    <div class="brand-title">HuellitasVet</div>
+                    <div class="brand-subtitle">Sistema veterinario</div>
+                </div>
+            </div>
+
+            <!-- Menú de Navegación -->
+            <ul class="sidebar-menu p-0">
+                <li class="menu-header">MENÚ</li>
+                <li>
+                    <a th:href="@{/inicio}" class="nav-link-custom">
+                        <i class="bi bi-grid-fill"></i>
+                        <span>Inicio</span>
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/propietarios}" class="nav-link-custom active">
+                        <i class="bi bi-people-fill"></i>
+                        <span>Propietarios</span>
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/mascotas}" class="nav-link-custom">
+                        <i class="bi bi-heart-pulse"></i>
+                        <span>Mascotas</span>
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/citas}" class="nav-link-custom">
+                        <i class="bi bi-calendar-event"></i>
+                        <span>Citas</span>
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/veterinarios}" class="nav-link-custom">
+                        <i class="bi bi-person-badge"></i>
+                        <span>Veterinarios</span>
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/historial}" class="nav-link-custom">
+                        <i class="bi bi-file-earmark-text"></i>
+                        <span>Historial clínico</span>
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/usuarios}" class="nav-link-custom">
+                        <i class="bi bi-shield-check"></i>
+                        <span>Usuarios</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Footer del Sidebar (Perfil de usuario) -->
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="avatar-circle">PV</div>
+                <div class="user-info">
+                    <div class="user-name">Patricia Vargas</div>
+                    <div class="user-role">Administrador</div>
+                </div>
+            </div>
+            <form th:action="@{/logout}" method="post" class="d-inline">
+                <button type="submit" class="btn btn-link btn-logout p-0 border-0 bg-transparent">
+                    <i class="bi bi-box-arrow-left"></i>
+                    <span>Cerrar sesión</span>
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <!-- Contenido Principal -->
+    <main class="main-content">
+        <!-- Encabezado de Página -->
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Propietarios</h1>
+                <p class="page-subtitle">Personas responsables de las mascotas registradas.</p>
+            </div>
+            <button class="btn btn-teal" data-bs-toggle="modal" data-bs-target="#modalNuevoPropietario">
+                <i class="bi bi-plus-lg"></i>
+                <span>Nuevo propietario</span>
+            </button>
+        </div>
+
+        <!-- Tarjeta Contenedora -->
+        <div class="card-custom">
+            <!-- Buscador -->
+            <div class="search-container position-relative">
+                <i class="bi bi-search search-icon"></i>
+                <input type="text" class="form-control search-input" placeholder="Buscar propietario...">
+            </div>
+
+            <!-- Tabla de Propietarios -->
+            <div class="table-responsive">
+                <table class="table table-custom">
+                    <thead>
+                        <tr>
+                            <th>NOMBRE COMPLETO</th>
+                            <th>TELÉFONO</th>
+                            <th>CORREO</th>
+                            <th>MASCOTAS</th>
+                            <th>ACCIONES</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaPropietariosCuerpo">
+                        <!-- Carga dinámica mediante Fetch API -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Nuevo Propietario -->
+    <div class="modal fade" id="modalNuevoPropietario" tabindex="-1" aria-labelledby="modalNuevoPropietarioLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-custom">
+                <!-- Header -->
+                <div class="modal-header border-0 pb-0 pt-4 px-4">
+                    <h5 class="modal-title fw-bold text-dark fs-5" id="modalNuevoPropietarioLabel">Nuevo propietario</h5>
+                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <!-- Body (Formulario) -->
+                <div class="modal-body px-4 py-3">
+                    <form id="formNuevoPropietario" th:action="@{/}">
+                        <!-- Nombres y Apellidos -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label for="nombres" class="form-label-custom">Nombres<span class="text-danger">*</span></label>
+                                <input type="text" class="form-control form-control-custom" id="nombres" placeholder="María" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="apellidos" class="form-label-custom">Apellidos<span class="text-danger">*</span></label>
+                                <input type="text" class="form-control form-control-custom" id="apellidos" placeholder="García López" required>
+                            </div>
+                        </div>
+
+                        <!-- Teléfono -->
+                        <div class="mb-3">
+                            <label for="telefono" class="form-label-custom">Teléfono<span class="text-danger">*</span></label>
+                            <input type="tel" class="form-control form-control-custom" id="telefono" placeholder="555-0000" required>
+                        </div>
+
+                        <!-- Correo electrónico -->
+                        <div class="mb-4">
+                            <label for="correo" class="form-label-custom">Correo electrónico<span class="text-danger">*</span></label>
+                            <input type="email" class="form-control form-control-custom" id="correo" placeholder="correo@ejemplo.com" required>
+                        </div>
+
+                        <!-- Botones de Acción -->
+                        <div class="d-flex align-items-center gap-2 pt-1">
+                            <button type="submit" class="btn btn-teal-modal">Guardar propietario</button>
+                            <button type="button" class="btn btn-cancel-modal" data-bs-dismiss="modal">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Bootstrap Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Script JS Propio para Fetch API (src/main/resources/static/js/propietarios.js) -->
+    <script th:src="@{/js/propietarios.js}"></script>
+</body>
+
+</html>

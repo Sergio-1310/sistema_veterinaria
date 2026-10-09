@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<th:block th:fragment="filas">
+    <tr th:each="v : ${veterinarios}">
+        <!-- Columna: Nombre, Iniciales y Correo Secundario -->
+        <td>
+            <div class="d-flex align-items-center">
+                <span class="owner-avatar" th:text="${v.iniciales}">AF</span>
+                <div class="ms-2">
+                    <div class="fw-medium text-dark" th:text="${v.nombreCompletoConTitulo}">Dr. Andrés Fuentes Mora</div>
+                    <small class="text-muted" th:text="${v.correo}">a.fuentes@huellitasvet.com</small>
+                </div>
+            </div>
+        </td>
+
+        <!-- Columna: Especialidad -->
+        <td class="align-middle" th:text="${v.especialidad}">Medicina General</td>
+
+        <!-- Columna: Teléfono -->
+        <td class="align-middle" th:text="${v.telefono}">555-1001</td>
+
+        <!-- Columna: Correo -->
+        <td class="align-middle" th:text="${v.correo}">a.fuentes@huellitasvet.com</td>
+
+        <!-- Columna: Estado (Badge Activo / Inactivo) -->
+        <td class="align-middle">
+            <span th:if="${v.activo}" class="badge-status badge-status-active">
+                <span class="status-dot"></span> Activo
+            </span>
+            <span th:unless="${v.activo}" class="badge-status badge-status-inactive">
+                <span class="status-dot"></span> Inactivo
+            </span>
+        </td>
+
+        <!-- Columna: Acciones (Editar) -->
+        <td class="align-middle">
+            <a href="#" class="action-link"
+               th:hx-get="@{/veterinarios/modal-formulario/{id}(id=${v.id})}"
+               hx-target="#modal-veterinario-contenido"
+               data-bs-toggle="modal"
+               data-bs-target="#modalVeterinario">
+                <i class="bi bi-pencil"></i> Editar
+            </a>
+        </td>
+    </tr>
+
+    <!-- Mensaje si no hay registros -->
+    <tr th:if="${#lists.isEmpty(veterinarios)}">
+        <td colspan="6" class="text-center text-muted py-4">
+            No se encontraron veterinarios registrados.
+        </td>
+    </tr>
+</th:block>
+
+</body>
+</html>

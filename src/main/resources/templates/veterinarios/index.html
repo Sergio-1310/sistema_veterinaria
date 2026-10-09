@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es" 
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+
+<head>
+    <title>Veterinarios</title>
+</head>
+
+<body>
+
+    <main id="main-content" 
+          th:fragment="content" 
+          layout:fragment="content" 
+          class="main-content">
+
+        <!-- Encabezado de Página -->
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Veterinarios</h1>
+                <p class="page-subtitle">Personal veterinario de la clínica.</p>
+            </div>
+            <button class="btn btn-teal" 
+                    hx-get="/veterinarios/modal-formulario" 
+                    hx-target="#modal-veterinario-contenido" 
+                    data-bs-toggle="modal" 
+                    data-bs-target="#modalVeterinario">
+                <i class="bi bi-plus-lg"></i>
+                <span>Nuevo veterinario</span>
+            </button>
+        </div>
+
+        <!-- Tarjeta Contenedora -->
+        <div class="card-custom">
+            <!-- Buscador con HTMX integrado -->
+            <div class="search-container position-relative">
+                <i class="bi bi-search search-icon"></i>
+                <input type="text" 
+                       name="buscar"
+                       class="form-control search-input" 
+                       placeholder="Buscar veterinario..."
+                       hx-get="/veterinarios/tabla"
+                       hx-trigger="input changed delay:300ms, search"
+                       hx-target="#tablaVeterinariosCuerpo">
+            </div>
+
+            <!-- Tabla de Veterinarios -->
+            <div class="table-responsive">
+                <table class="table table-custom">
+                    <thead>
+                        <tr>
+                            <th>NOMBRE</th>
+                            <th>ESPECIALIDAD</th>
+                            <th>TELÉFONO</th>
+                            <th>CORREO</th>
+                            <th>ESTADO</th>
+                            <th>ACCIONES</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaVeterinariosCuerpo">
+                        <!-- Inclusión de las filas iniciales -->
+                        <th:block th:replace="~{veterinarios/fragments/veterinarios-filas :: filas}"></th:block>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Modal Único de Veterinario -->
+        <div class="modal fade" id="modalVeterinario" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content modal-custom" id="modal-veterinario-contenido">
+                    <!-- HTMX inyecta el contenido aquí -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Pequeño listener para cerrar modal -->
+        <script>
+            document.body.addEventListener('cerrarModalVeterinario', () => {
+                const modalEl = document.getElementById('modalVeterinario');
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) modal.hide();
+            });
+        </script>
+    </main>
+
+</body>
+</html>

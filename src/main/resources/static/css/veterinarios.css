@@ -1,0 +1,34 @@
+/* Badges de estado con punto verde/gris */
+.badge-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 50rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+}
+
+.status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+
+/* Estado Activo (Verde suave) */
+.badge-status-active {
+    background-color: #eaf8f0;
+    color: #1e834a;
+}
+.badge-status-active .status-dot {
+    background-color: #28a745;
+}
+
+/* Estado Inactivo (Gris suave) */
+.badge-status-inactive {
+    background-color: #f1f3f5;
+    color: #6c757d;
+}
+.badge-status-inactive .status-dot {
+    background-color: #adb5bd;
+}

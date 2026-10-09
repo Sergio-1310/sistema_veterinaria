@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+    <aside th:fragment="sidebar" class="sidebar">
+        <div>
+            <!-- Brand Logo -->
+            <div class="sidebar-brand">
+                <div class="brand-icon">
+                    <i class="fa-solid fa-paw fs-4 text-white"></i>
+                </div>
+                <div>
+                    <div class="brand-title">HuellitasVet</div>
+                    <div class="brand-subtitle">Sistema veterinario</div>
+                </div>
+            </div>
+
+            <!-- Menú de Navegación impulsado por HTMX -->
+            <ul class="sidebar-menu p-0">
+                <li class="menu-header">MENÚ</li>
+                <li>
+                    <a th:href="@{/inicio}" 
+                       hx-get="/inicio" 
+                       hx-target="#main-content" 
+                       hx-swap="outerHTML" 
+                       hx-push-url="true" 
+                       class="nav-link-custom">
+                        <i class="bi bi-grid-fill"></i>
+                        <span>Inicio</span>
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/propietarios}" 
+                       hx-get="/propietarios" 
+                       hx-target="#main-content" 
+                       hx-swap="outerHTML" 
+                       hx-push-url="true" 
+                       class="nav-link-custom active">
+                        <i class="bi bi-people-fill"></i>
+                        <span>Propietarios</span>
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/mascotas}" 
+                       hx-get="/mascotas" 
+                       hx-target="#main-content" 
+                       hx-swap="outerHTML" 
+                       hx-push-url="true" 
+                       class="nav-link-custom">
+                        <i class="bi bi-heart-pulse"></i>
+                        <span>Mascotas</span>
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/citas}" 
+                       hx-get="/citas" 
+                       hx-target="#main-content" 
+                       hx-swap="outerHTML" 
+                       hx-push-url="true" 
+                       class="nav-link-custom">
+                        <i class="bi bi-calendar-event"></i>
+                        <span>Citas</span>
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/veterinarios}" 
+                       hx-get="/veterinarios" 
+                       hx-target="#main-content" 
+                       hx-swap="outerHTML" 
+                       hx-push-url="true" 
+                       class="nav-link-custom">
+                        <i class="bi bi-person-badge"></i>
+                        <span>Veterinarios</span>
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/historial}" 
+                       hx-get="/historial" 
+                       hx-target="#main-content" 
+                       hx-swap="outerHTML" 
+                       hx-push-url="true" 
+                       class="nav-link-custom">
+                        <i class="bi bi-file-earmark-text"></i>
+                        <span>Historial clínico</span>
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/usuarios}" 
+                       hx-get="/usuarios" 
+                       hx-target="#main-content" 
+                       hx-swap="outerHTML" 
+                       hx-push-url="true" 
+                       class="nav-link-custom">
+                        <i class="bi bi-shield-check"></i>
+                        <span>Usuarios</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Footer del Sidebar -->
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="avatar-circle">PV</div>
+                <div class="user-info">
+                    <div class="user-name">Patricia Vargas</div>
+                    <div class="user-role">Administrador</div>
+                </div>
+            </div>
+            <form th:action="@{/logout}" method="post" class="d-inline">
+                <button type="submit" class="btn btn-link btn-logout p-0 border-0 bg-transparent">
+                    <i class="bi bi-box-arrow-left"></i>
+                    <span>Cerrar sesión</span>
+                </button>
+            </form>
+        </div>
+    </aside>
+
+</body>
+</html>

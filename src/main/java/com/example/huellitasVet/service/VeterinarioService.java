@@ -9,9 +9,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @Service
-@RequiredArgsConstructor 
+@RequiredArgsConstructor
 public class VeterinarioService {
 
     private final VeterinarioRepository veterinarioRepository;
@@ -41,5 +42,17 @@ public class VeterinarioService {
             veterinario.setActivo(true);
         }
         return veterinarioRepository.save(veterinario);
+    }
+
+    @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
+    public void desactivar(Long id) {
+
+        int filasAfectadas = veterinarioRepository.desactivar(id);
+
+        if (filasAfectadas == 0) {
+            throw new RuntimeException(
+                    "Veterinario no encontrado");
+        }
     }
 }

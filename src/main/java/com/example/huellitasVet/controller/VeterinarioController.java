@@ -10,15 +10,17 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-@RequiredArgsConstructor 
+@RequiredArgsConstructor
 @RequestMapping("/veterinarios")
 public class VeterinarioController {
 
     private final VeterinarioService veterinarioService;
 
-    // 1. Cargar la vista principal (con layout o solo fragment si es HTMX desde el sidebar)
+    // 1. Cargar la vista principal (con layout o solo fragment si es HTMX desde el
+    // sidebar)
     @GetMapping
-    public String vistaVeterinarios(@RequestHeader(value = "HX-Request", required = false) boolean isHtmx, Model model) {
+    public String vistaVeterinarios(@RequestHeader(value = "HX-Request", required = false) boolean isHtmx,
+            Model model) {
         model.addAttribute("veterinarios", veterinarioService.listarTodos());
         if (isHtmx) {
             return "veterinarios/index :: content";
@@ -47,14 +49,28 @@ public class VeterinarioController {
         return "veterinarios/fragments/modal-veterinario :: formulario";
     }
 
+    @PostMapping("/{id}/desactivar")
+    public String desactivar(
+            @PathVariable Long id,
+            Model model) {
+
+        veterinarioService.desactivar(id);
+
+        model.addAttribute(
+                "veterinarios",
+                veterinarioService.listarTodos());
+
+        return "veterinarios/fragments/veterinarios-filas :: filas";
+    }
+
     // 5. Guardar (creación o edición) y refrescar la tabla
     @PostMapping("/guardar")
     public String guardar(@ModelAttribute Veterinario veterinario, Model model, HttpServletResponse response) {
         veterinarioService.guardar(veterinario);
-        
+
         // Cabecera HTMX para que el modal se cierre automáticamente
         response.setHeader("HX-Trigger", "cerrarModalVeterinario");
-        
+
         model.addAttribute("veterinarios", veterinarioService.listarTodos());
         return "veterinarios/fragments/veterinarios-filas :: filas";
     }

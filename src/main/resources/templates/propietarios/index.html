@@ -1,106 +1,157 @@
-<!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-    layout:decorate="~{layout/default}">
-
-<head>
+<!doctype html>
+<html
+  lang="es"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layout/default}"
+>
+  <head>
     <title>Propietarios</title>
-</head>
+  </head>
 
-<body>
+  <body>
+    <main
+      id="main-content"
+      th:fragment="content"
+      layout:fragment="content"
+      class="main-content"
+    >
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Propietarios</h1>
+          <p class="page-subtitle">
+            Personas responsables de las mascotas registradas.
+          </p>
+        </div>
+        <!-- En el botón de Nuevo propietario -->
+        <button
+          class="btn btn-teal"
+          data-bs-toggle="modal"
+          data-bs-target="#modalNuevoPropietario"
+          onclick="prepararCreacion()"
+        >
+          <i class="bi bi-plus-lg"></i>
+          <span>Nuevo propietario</span>
+        </button>
+      </div>
 
-    <main id="main-content" th:fragment="content" layout:fragment="content" class="main-content">
-
-        <div class="page-header">
-            <div>
-                <h1 class="page-title">Propietarios</h1>
-                <p class="page-subtitle">Personas responsables de las mascotas registradas.</p>
-            </div>
-            <!-- En el botón de Nuevo propietario -->
-            <button class="btn btn-teal" data-bs-toggle="modal" data-bs-target="#modalNuevoPropietario"
-                onclick="prepararCreacion()">
-                <i class="bi bi-plus-lg"></i>
-                <span>Nuevo propietario</span>
-            </button>
+      <div class="card-custom">
+        <div class="search-container position-relative">
+          <i class="bi bi-search search-icon"></i>
+          <input
+            type="text"
+            class="form-control search-input"
+            placeholder="Buscar propietario..."
+          />
         </div>
 
-        <div class="card-custom">
-            <div class="search-container position-relative">
-                <i class="bi bi-search search-icon"></i>
-                <input type="text" class="form-control search-input" placeholder="Buscar propietario...">
-            </div>
-
-            <div class="table-responsive">
-                <table class="table table-custom">
-                    <thead>
-                        <tr>
-                            <th>NOMBRE COMPLETO</th>
-                            <th>TELÉFONO</th>
-                            <th>CORREO</th>
-                            <th>MASCOTAS</th>
-                            <th>ACCIONES</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tablaPropietariosCuerpo">
-                    </tbody>
-                </table>
-            </div>
+        <div class="table-responsive">
+          <table class="table table-custom">
+            <thead>
+              <tr>
+                <th>NOMBRE COMPLETO</th>
+                <th>TELÉFONO</th>
+                <th>CORREO</th>
+                <th>MASCOTAS</th>
+                <th>ACCIONES</th>
+              </tr>
+            </thead>
+            <tbody id="tablaPropietariosCuerpo"></tbody>
+          </table>
         </div>
+      </div>
 
-        <!-- Modal Nuevo Propietario -->
-        <div class="modal fade" id="modalNuevoPropietario" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content modal-custom">
-                    <div class="modal-header border-0 pb-0 pt-4 px-4">
-                        <h5 class="modal-title fw-bold text-dark fs-5">Nuevo propietario</h5>
-                        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal"
-                            aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body px-4 py-3">
-                        <form id="formNuevoPropietario">
+      <!-- Modal Nuevo Propietario -->
+      <div
+        class="modal fade"
+        id="modalNuevoPropietario"
+        tabindex="-1"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content modal-custom">
+            <div class="modal-header border-0 pb-0 pt-4 px-4">
+              <h5 class="modal-title fw-bold text-dark fs-5">
+                Nuevo propietario
+              </h5>
+              <button
+                type="button"
+                class="btn-close shadow-none"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body px-4 py-3">
+              <form id="formNuevoPropietario">
+                <input type="hidden" id="propietarioId" name="id" />
 
-                            <input type="hidden" id="propietarioId" name="id">
-
-                            <div class="row g-3 mb-3">
-                                <div class="col-md-6">
-                                    <label for="nombres" class="form-label-custom">Nombres<span
-                                            class="text-danger">*</span></label>
-                                    <input type="text" class="form-control form-control-custom" id="nombres"
-                                        placeholder="María" required>
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="apellidos" class="form-label-custom">Apellidos<span
-                                            class="text-danger">*</span></label>
-                                    <input type="text" class="form-control form-control-custom" id="apellidos"
-                                        placeholder="García López" required>
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label for="telefono" class="form-label-custom">Teléfono<span
-                                        class="text-danger">*</span></label>
-                                <input type="tel" class="form-control form-control-custom" id="telefono"
-                                    placeholder="555-0000" required>
-                            </div>
-                            <div class="mb-4">
-                                <label for="correo" class="form-label-custom">Correo electrónico<span
-                                        class="text-danger">*</span></label>
-                                <input type="email" class="form-control form-control-custom" id="correo"
-                                    placeholder="correo@ejemplo.com" required>
-                            </div>
-                            <div class="d-flex align-items-center gap-2 pt-1">
-                                <button type="submit" class="btn btn-teal-modal">Guardar propietario</button>
-                                <button type="button" class="btn btn-cancel-modal"
-                                    data-bs-dismiss="modal">Cancelar</button>
-                            </div>
-                        </form>
-                    </div>
+                <div class="row g-3 mb-3">
+                  <div class="col-md-6">
+                    <label for="nombres" class="form-label-custom"
+                      >Nombres<span class="text-danger">*</span></label
+                    >
+                    <input
+                      type="text"
+                      class="form-control form-control-custom"
+                      id="nombres"
+                      placeholder="María"
+                      required
+                    />
+                  </div>
+                  <div class="col-md-6">
+                    <label for="apellidos" class="form-label-custom"
+                      >Apellidos<span class="text-danger">*</span></label
+                    >
+                    <input
+                      type="text"
+                      class="form-control form-control-custom"
+                      id="apellidos"
+                      placeholder="García López"
+                      required
+                    />
+                  </div>
                 </div>
+                <div class="mb-3">
+                  <label for="telefono" class="form-label-custom"
+                    >Teléfono<span class="text-danger">*</span></label
+                  >
+                  <input
+                    type="tel"
+                    class="form-control form-control-custom"
+                    id="telefono"
+                    placeholder="555-0000"
+                    required
+                  />
+                </div>
+                <div class="mb-4">
+                  <label for="correo" class="form-label-custom"
+                    >Correo electrónico<span class="text-danger">*</span></label
+                  >
+                  <input
+                    type="email"
+                    class="form-control form-control-custom"
+                    id="correo"
+                    placeholder="correo@ejemplo.com"
+                    required
+                  />
+                </div>
+                <div class="d-flex align-items-center gap-2 pt-1">
+                  <button type="submit" class="btn btn-teal-modal">
+                    Guardar propietario
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-cancel-modal"
+                    data-bs-dismiss="modal"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </form>
             </div>
+          </div>
         </div>
-
-        <!-- Carga del JS de la vista -->
-        <script th:src="@{/js/propietarios.js}"></script>
+      </div>
     </main>
-
-</body>
-
+  </body>
 </html>

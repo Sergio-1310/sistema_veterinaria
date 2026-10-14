@@ -11,28 +11,38 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 public class DataInitializer {
 
-
     @Bean
-    public CommandLineRunner initData(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
+    public CommandLineRunner initData(
+            UsuarioRepository usuarioRepository,
+            PasswordEncoder passwordEncoder) {
+
         return args -> {
+
+            // ADMIN
             String emailAdmin = "admin@admin.com";
-            
+
             if (usuarioRepository.findByEmail(emailAdmin).isEmpty()) {
-                
                 Usuario admin = new Usuario();
                 admin.setNombre("Administrador");
                 admin.setEmail(emailAdmin);
                 admin.setRol("ADMIN");
-                
-                String passwordPlana = "admin";
-                String passwordEncriptada = passwordEncoder.encode(passwordPlana);
-                
-                admin.setPassword(passwordEncriptada);
+                admin.setPassword(passwordEncoder.encode("admin"));
 
                 usuarioRepository.save(admin);
-                
-            } else {
-                System.out.println("Usuario ya creado");
+            }
+
+            // VETERINARIO
+            String emailVeterinario = "veterinario@huellitas.com";
+
+            if (usuarioRepository.findByEmail(emailVeterinario).isEmpty()) {
+                Usuario veterinario = new Usuario();
+                veterinario.setNombre("Veterinario");
+                veterinario.setEmail(emailVeterinario);
+                veterinario.setRol("VETERINARIO");
+                veterinario.setPassword(
+                        passwordEncoder.encode("vet123"));
+
+                usuarioRepository.save(veterinario);
             }
         };
     }

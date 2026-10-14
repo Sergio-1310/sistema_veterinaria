@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 
 import com.example.huellitasVet.security.JwtAuthenticationFilter;
 
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -30,8 +32,25 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/css/**", "/js/**").permitAll()
-                        .requestMatchers("/login").permitAll()
+
+                        .requestMatchers(
+                                "/",
+                                "/login",
+                                "/favicon.ico",
+                                "/css/**",
+                                "/js/**")
+                        .permitAll()
+
+                        .requestMatchers(
+                                "/propietarios",
+                                "/propietarios/**")
+                        .hasAnyRole("ADMIN", "VETERINARIO")
+
+                        .requestMatchers(
+                                "/veterinarios",
+                                "/veterinarios/**")
+                        .hasAnyRole("ADMIN", "VETERINARIO")
+
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         // .formLogin(login -> login

@@ -2,19 +2,54 @@
 
 Aplicación de gestión interna de una clínica veterinaria. El Avance 3 conecta un frontend Angular 22 con una API Spring Boot 4.1, Java 21, JPA y MySQL. La recepción vincula pacientes con propietarios y programa citas. El veterinario registra la atención y el administrador gestiona el equipo y sus accesos. El portal público de clientes del alcance preliminar queda fuera de este avance.
 
-## Inicio en Windows y VS Code
+## Instalación nueva en Windows con VS Code
 
-Abre la carpeta que contiene `pom.xml` y `frontend/`. Se necesita un JDK 21, Node.js compatible con Angular 22 (se verificó con 24.22.1), npm y MySQL en ejecución. El proyecto incluye el wrapper de Maven. Usa dos terminales PowerShell desde la raíz.
+Necesitas Git, VS Code, JDK 21 (incluye `javac`), Node.js 24.15 o posterior de la serie 24 con npm, y MySQL Server 8.0 o superior con MySQL Workbench. Inicia el servicio MySQL local en el puerto 3306. Ten a mano tu usuario y contraseña de MySQL con acceso para crear la base y sus tablas. La primera instalación requiere conexión a Internet para Maven y npm.
 
-**Terminal 1 · API**
+### 1. Clonar y abrir el proyecto
+
+Desde PowerShell:
 
 ```powershell
-.\scripts\iniciar-api.ps1
+git clone --branch angular --single-branch https://github.com/Sergio-1310/sistema_veterinaria.git HuellitasVet
+cd HuellitasVet
+code .
 ```
 
-El script utiliza la configuración local en `%LOCALAPPDATA%\HuellitasVet\entorno.xml`. Windows cifra la contraseña de MySQL y el secreto JWT para el usuario actual mediante DPAPI. En una instalación nueva solicita las credenciales y genera una clave aleatoria de 32 bytes. Para actualizar esa configuración ejecuta `.\scripts\iniciar-api.ps1 -Configurar`. La rotación de clave invalida los tokens emitidos previamente.
+En VS Code abre **Terminal → Nueva terminal**, selecciona PowerShell y comprueba los requisitos:
 
-**Terminal 2 · Angular**
+```powershell
+git branch --show-current
+javac -version
+node --version
+npm.cmd --version
+```
+
+La rama debe ser `angular` y el compilador Java debe indicar 21. Si Windows no reconoce `code`, abre VS Code y selecciona la carpeta clonada con **Archivo → Abrir carpeta**.
+
+### 2. Crear la base de datos
+
+1. En MySQL Workbench abre la conexión de tu computadora. Selecciona **File → Open SQL Script** y abre `db/instalacion/01_esquema.sql` desde la carpeta clonada.
+2. Ejecuta el archivo completo con **Query → Execute (All or Selection)**, sin seleccionar texto. El script crea `huellitas_vet` y sus seis tablas vacías. En **Schemas**, pulsa actualizar y comprueba que aparece la base.
+3. **Opcional:** abre y ejecuta `db/instalacion/02_demo_opcional.sql` del mismo modo. Agrega dos propietarios, dos mascotas, dos veterinarios y dos citas futuras de ejemplo. Se omite si la clínica ya tiene registros. Las cuentas de acceso se crean por separado.
+
+Utiliza el esquema inicial una sola vez, en una instalación vacía. Si ya trabajabas con datos del Avance 2, sigue la sección **Persistencia y migración del Avance 2**. Si tu instalación ya tiene las seis tablas del Avance 3, continúa con el arranque normal.
+
+### 3. Configurar MySQL y crear el primer administrador
+
+Desde la terminal PowerShell de VS Code, en la carpeta con `pom.xml`:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -File .\scripts\iniciar-api.ps1 -CrearAdministrador
+```
+
+La primera vez, escribe el usuario y la contraseña **de MySQL de tu equipo**. A continuación, elige un correo y una contraseña **para el administrador de HuellitasVet** y confírmala. La entrada de contraseñas está oculta. La clave del administrador admite un mínimo de 10 caracteres y un máximo de 72 bytes UTF-8.
+
+El script guarda la configuración de conexión en `%LOCALAPPDATA%\HuellitasVet\entorno.xml`. Windows cifra la contraseña de MySQL y la clave JWT para tu cuenta de Windows. Spring Boot guarda el hash BCrypt del administrador en MySQL. El perfil `bootstrap` crea la cuenta solo si `usuarios` está vacía. Espera el mensaje `Started HuellitasVetApplication` y deja la terminal abierta.
+
+### 4. Iniciar Angular y entrar
+
+Abre una **segunda terminal PowerShell** en la raíz del repositorio:
 
 ```powershell
 cd frontend
@@ -22,15 +57,23 @@ npm.cmd ci
 npm.cmd start
 ```
 
-Abre [HuellitasVet en localhost](http://localhost:4200). Las peticiones a `/api` pasan por el proxy de Angular hacia el puerto 8080. Para otro backend configura `HV_API_TARGET` al iniciar Angular. El despliegue del build de producción requiere servir `dist/frontend/browser`, redirigir las rutas de Angular a `index.html` y enviar `/api/**` al backend.
+Abre [HuellitasVet](http://localhost:4200/login) e ingresa con el correo y la contraseña ADMIN que elegiste. Angular se conecta a la API local en el puerto 8080 mediante su proxy.
 
-### Configuración directa del backend
+### Siguientes arranques
 
-También puedes definir `DB_USER`, `DB_PASSWORD` y `JWT_SECRET` en el entorno de la terminal y ejecutar `.\mvnw.cmd spring-boot:run`. La clave JWT se facilita en Base64 y debe decodificarse a 32 bytes como mínimo. El inicio por script respeta las variables ya definidas.
+En la primera terminal ejecuta el siguiente comando desde la raíz. En la segunda, desde `frontend`, ejecuta `npm.cmd start`. Para detener un servidor pulsa **Ctrl+C** en su terminal.
 
-- `DB_URL` usa por defecto `jdbc:mysql://localhost:3306/huellitas_vet`.
-- `ANGULAR_ORIGIN` controla el origen admitido por CORS y la redirección de la raíz, con valor inicial `http://localhost:4200`.
-- `SERVER_PORT` y `SERVER_ADDRESS` controlan la escucha HTTP. La configuración de desarrollo usa el puerto 8080 en la interfaz local.
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -File .\scripts\iniciar-api.ps1
+```
+
+### Solución de problemas
+
+- **Puerto 4200 ocupado.** Detén la ejecución anterior de Angular o ejecuta `npm.cmd start -- --port 4300` desde `frontend` y abre [el login en 4300](http://localhost:4300/login). El proxy usa el mismo origen que la página.
+- **Puerto 8080 ocupado.** En la terminal de la API define `$env:SERVER_PORT = '8081'` antes de iniciarla. En la terminal de Angular define `$env:HV_API_TARGET = 'http://127.0.0.1:8081'` antes de `npm.cmd start`. Reinicia ambos si ya estaban abiertos.
+- **MySQL rechaza la conexión.** Comprueba en **Servicios** de Windows que MySQL esté iniciado y prueba la conexión en Workbench. Si usa otro puerto, por ejemplo 3307, define `$env:DB_URL = 'jdbc:mysql://127.0.0.1:3307/huellitas_vet'` en la terminal de la API antes de arrancarla.
+- **MySQL indica “Access denied”.** Verifica el usuario y la contraseña en Workbench. Vuelve a ejecutar el comando de la API con `-Configurar` para guardarlos de nuevo. Si aún debes crear el primer administrador, añade también `-CrearAdministrador`. La reconfiguración genera otra clave JWT y las sesiones abiertas deben volver a entrar. Si definiste `DB_USER`, `DB_PASSWORD` o `JWT_SECRET` en el entorno, sus valores tienen prioridad.
+- **Angular indica “Correo o contraseña incorrectos”.** Usa las credenciales ADMIN del paso 3. Si ya existen usuarios, `-CrearAdministrador` conserva sus cuentas. Otro administrador puede restablecer la contraseña desde **Usuarios**.
 
 ## Acceso y roles
 
@@ -54,7 +97,7 @@ Spring Security valida el rol en cada petición. La API emite tokens Bearer de u
 
 El script versionado `db/migraciones/V3__agenda_clinica.sql` amplía las tablas `mascota`, `cita` y `usuarios` del Avance 2 y agrega `atenciones`. Las relaciones se protegen con claves foráneas. Se conservan los identificadores, la edad anterior, el nombre anterior del propietario y las cadenas originales de fecha y hora de las citas. Las consultas clínicas obtienen la mascota, el veterinario y el motivo mediante su cita, que queda cerrada después de la atención.
 
-**En la instalación local de esta entrega, V3 ya está aplicada.** La aplicación arranca con `ddl-auto=validate` y `spring.sql.init.mode=never`. Para migrar otra instalación del Avance 2:
+**Usa V3 solo si partes de las cinco tablas del Avance 2 sin migrar. La instalación nueva ya incluye esos cambios.** La aplicación arranca con `ddl-auto=validate` y `spring.sql.init.mode=never`. Para migrar otra instalación del Avance 2:
 
 1. Verifica el esquema y realiza un respaldo completo con MySQL. Restaura ese respaldo en una base aislada y compara los datos antes de tocar el original.
 2. Ensaya V3 en la copia. En MySQL Workbench selecciona el esquema de destino, abre el archivo SQL y ejecuta el script completo una sola vez. Las operaciones DDL de MySQL confirman cada cambio de esquema. Si se interrumpe el script, inspecciona las columnas, índices y restricciones ya aplicados antes de continuar con las instrucciones pendientes.
@@ -112,11 +155,3 @@ npm.cmd test
 
 El comando utiliza Microsoft Edge instalado. Con Chromium de Playwright, instala el navegador con `npx.cmd playwright install chromium` y usa el canal `chromium`. Las pruebas se ejecutan contra una base separada de la clínica.
 Para comprobar persistencia, toma el ID de la ficha creada en el primer recorrido, reinicia el backend de pruebas y define `E2E_FICHA_ANTERIOR` con ese ID antes de repetir `npm.cmd test`. La segunda prueba inicia una sesión nueva, abre esa misma ficha y verifica el estado de su cita.
-
-### Resultados de esta entrega
-
-- Maven empaquetó el backend con Java 21. La prueba HTTP integrada pasó con 0 fallos y 0 errores.
-- Angular 22.2.6 compiló en producción con validación estricta de TypeScript y plantillas.
-- Edge completó los dos escenarios Playwright contra la copia MySQL, incluido el acceso a la atención previa después de reiniciar ambos servidores.
-- En la base local se conservaron los 3 propietarios, 1 mascota, 2 veterinarios y 2 usuarios originales. La agenda estaba vacía antes de la migración. Una restauración aislada y la comparación de sus datos verificaron el respaldo.
-- La mascota heredada con ID 1 requiere identificar al propietario en **Mascotas → Editar**. La cuenta veterinaria anterior necesita que un administrador confirme a qué profesional corresponde y alinee su correo en **Usuarios** o **Veterinarios** antes de registrar atenciones con esa cuenta.

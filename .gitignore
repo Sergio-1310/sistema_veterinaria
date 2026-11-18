@@ -44,3 +44,22 @@ backups/
 !.env.example
 frontend/test-results/
 frontend/playwright-report/
+# Credenciales y copias de seguridad locales
+entorno.xml
+.mylogin.cnf
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.bak
+*.dump
+*.sql.*
+*.sql
+!db/instalacion/01_esquema.sql
+!db/instalacion/02_demo_opcional.sql
+!db/migraciones/V*.sql
+Respaldos/
+*.jar
+*.war
+node_modules/

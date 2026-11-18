@@ -1,48 +1,38 @@
 package com.example.huellitasVet.security;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import com.example.huellitasVet.model.Usuario;
+
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.time.Instant;
 import java.util.Date;
 
 @Component
 public class JwtUtil {
+    private final Key clave;
 
-    // Clave secreta (en producción va en application.properties)
-    private static final Key SIGNING_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-    private static final long EXPIRATION_TIME = 86_400_000; // 24 horas en milisegundos
+    public JwtUtil(@Value("${app.jwt.secret}") String secreto) {
+        clave = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secreto));
+    }
 
-    public String generarToken(String username, String rol) {
+    public String emitir(Usuario usuario) {
+        var ahora = Instant.now();
         return Jwts.builder()
-                .setSubject(username)
-                .claim("rol", rol)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .signWith(SIGNING_KEY)
+                .setSubject(usuario.getId().toString())
+                .claim("v", usuario.getVersionSesion())
+                .setIssuedAt(Date.from(ahora))
+                .setExpiration(Date.from(ahora.plusSeconds(3600)))
+                .signWith(clave)
                 .compact();
     }
 
-    public String extraerUsername(String token) {
-        return obtenerClaims(token).getSubject();
-    }
-
-    public boolean esTokenValido(String token) {
-        try {
-            return obtenerClaims(token).getExpiration().after(new Date());
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    private Claims obtenerClaims(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(SIGNING_KEY)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+    public Claims verificar(String token) {
+        return Jwts.parserBuilder().setSigningKey(clave).build().parseClaimsJws(token).getBody();
     }
 }

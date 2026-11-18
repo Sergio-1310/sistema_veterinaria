@@ -1,69 +1,53 @@
 package com.example.huellitasVet.controller;
 
+import com.example.huellitasVet.dto.Solicitudes;
+import com.example.huellitasVet.model.Usuario;
+import com.example.huellitasVet.repository.UsuarioRepository;
 import com.example.huellitasVet.security.JwtUtil;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
+
+import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.*;
+import org.springframework.security.core.*;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
-@Controller
+import java.util.Map;
+
+@RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/auth")
 public class AuthController {
-
-    private final AuthenticationManager authenticationManager;
-    private final JwtUtil jwtUtil;
-
-    @GetMapping("/login")
-    public String loginView() {
-        return "login/login";
-    }
+    private final AuthenticationManager manager;
+    private final UsuarioRepository usuarios;
+    private final JwtUtil jwt;
 
     @PostMapping("/login")
-    public String procesarLogin(@RequestParam String email,
-            @RequestParam String password,
-            HttpServletResponse response) {
+    public Map<String, Object> login(@Valid @RequestBody Solicitudes.Login datos) {
         try {
-            Authentication auth = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(email, password));
-
-            // Generar el token
-            String rol = auth.getAuthorities().iterator().next().getAuthority();
-            String token = jwtUtil.generarToken(email, rol);
-
-            // Guardar el token en una Cookie HttpOnly
-            Cookie jwtCookie = new Cookie("jwt_token", token);
-            jwtCookie.setHttpOnly(true);
-            jwtCookie.setPath("/");
-            jwtCookie.setMaxAge(86400); // 1 día de duración
-            response.addCookie(jwtCookie);
-
-            return "redirect:/propietarios";
-        } catch (Exception e) {
-            return "redirect:/login?error=true";
+            var usuario = usuarios.findByEmail(datos.email().trim()).orElse(null);
+            manager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            datos.email().trim(), datos.password()));
+            if (usuario == null || !Boolean.TRUE.equals(usuario.getActivo()))
+                throw new BadCredentialsException("Cuenta no disponible");
+            return Map.of("token", jwt.emitir(usuario), "usuario", usuario);
+        } catch (AuthenticationException ex) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED, "Correo o contraseña incorrectos.");
         }
     }
 
-    @PostMapping("/auth/logout")
-    public String logout(HttpServletResponse response) {
-
-        // 1. Limpiar el contexto de seguridad de Spring de inmediato
-        SecurityContextHolder.clearContext();
-
-        Cookie jwtCookie = new Cookie("jwt_token", "");
-        jwtCookie.setHttpOnly(true);
-        jwtCookie.setPath("/"); // Mismo path con el que se creó
-        jwtCookie.setMaxAge(0); // 0 segundos = eliminación inmediata
-
-        response.addCookie(jwtCookie);
-
-        return "redirect:/login";
+    @GetMapping("/me")
+    public Usuario perfil(Authentication auth) {
+        return usuarios.findByEmail(auth.getName())
+                .filter(u -> Boolean.TRUE.equals(u.getActivo()))
+                .orElseThrow(
+                        () ->
+                                new ResponseStatusException(
+                                        HttpStatus.UNAUTHORIZED, "Sesión no válida."));
     }
 }

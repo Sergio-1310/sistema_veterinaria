@@ -1,6 +1,7 @@
 package com.example.huellitasVet.model;
 
 import jakarta.persistence.*;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,11 +26,28 @@ public class Mascota {
     private String raza;
 
     @Column(name = "edad")
-    private int edad;
+    private Integer edad;
 
     @Column(name = "nombre_propietario")
     private String nombrePropietario;
 
-    public Mascota() {
+    private java.time.LocalDate fechaNacimiento;
+    private String sexo;
+
+    @ManyToOne
+    @JoinColumn(name = "propietario_id")
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    private Propietario propietario;
+
+    public Long getPropietarioId() {
+        return propietario == null ? null : propietario.getId();
     }
+
+    public String getPropietarioNombre() {
+        return propietario == null
+                ? nombrePropietario
+                : propietario.getNombres() + " " + propietario.getApellidos();
+    }
+
+    public Mascota() {}
 }

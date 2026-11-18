@@ -5,11 +5,11 @@ import com.example.huellitasVet.repository.VeterinarioRepository;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import org.springframework.security.access.prepost.PreAuthorize;
 
 @Service
 @RequiredArgsConstructor
@@ -32,8 +32,12 @@ public class VeterinarioService {
 
     @Transactional(readOnly = true)
     public Veterinario buscarPorId(Long id) {
-        return veterinarioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Veterinario no encontrado con id: " + id));
+        return veterinarioRepository
+                .findById(id)
+                .orElseThrow(
+                        () ->
+                                com.example.huellitasVet.restController.ErroresApi.ausente(
+                                        "Veterinario"));
     }
 
     @Transactional
@@ -51,8 +55,7 @@ public class VeterinarioService {
         int filasAfectadas = veterinarioRepository.desactivar(id);
 
         if (filasAfectadas == 0) {
-            throw new RuntimeException(
-                    "Veterinario no encontrado");
+            throw new RuntimeException("Veterinario no encontrado");
         }
     }
 }

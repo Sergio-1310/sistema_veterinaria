@@ -1,17 +1,19 @@
 package com.example.huellitasVet.service;
 
+import com.example.huellitasVet.dto.*;
+
+import java.time.LocalDate;
 import java.util.List;
 
-import com.example.huellitasVet.model.Cita;
-
 public interface CitaService {
-    List<Cita> listar();
+    List<ResumenCita> buscar(
+            Long mascotaId, Long veterinarioId, LocalDate fecha, String estado, String q);
 
-    Cita buscarPorId(Long id);
+    ResumenCita detalle(Long id);
 
-    Cita registrar(Cita cita);
+    ResumenCita guardar(Long id, Solicitudes.Turno datos);
 
-    Cita actualizar(Long id, Cita cita);
+    void cancelar(Long id);
 
-    boolean eliminar(Long id);
+    FichaClinica atender(Long id, Solicitudes.Consulta datos, String email, boolean administrador);
 }

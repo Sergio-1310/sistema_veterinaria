@@ -1,6 +1,7 @@
 package com.example.huellitasVet.model;
 
 import jakarta.persistence.*;
+
 import lombok.Data;
 
 @Entity
@@ -19,7 +20,11 @@ public class Usuario {
     private String email;
 
     @Column(nullable = false, length = 255)
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    @lombok.ToString.Exclude
     private String password;
+
+    @com.fasterxml.jackson.annotation.JsonIgnore @Version private long versionSesion;
 
     @Column(nullable = false, length = 20)
     private String rol;

@@ -1,18 +1,16 @@
 package com.example.huellitasVet.service;
 
-import java.util.List;
-
+import com.example.huellitasVet.dto.Solicitudes.Paciente;
 import com.example.huellitasVet.model.Mascota;
 
-public interface MascotaService {
+import java.util.List;
 
-    List<Mascota> listar();
+public interface MascotaService {
+    List<Mascota> buscar(Long propietarioId, String especie, String q);
 
     Mascota buscarPorId(Long id);
 
-    Mascota registrar(Mascota mascota);
+    Mascota guardar(Long id, Paciente datos);
 
-    Mascota actualizar(Long id, Mascota mascota);
-
-    boolean eliminar(Long id);
+    void eliminar(Long id);
 }

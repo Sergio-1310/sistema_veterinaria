@@ -1,66 +1,57 @@
 package com.example.huellitasVet.restController;
 
+import com.example.huellitasVet.dto.Solicitudes.Persona;
 import com.example.huellitasVet.model.Propietario;
 import com.example.huellitasVet.service.PropietarioService;
+
+import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
-@RequestMapping("/api/propietarios")
 @RequiredArgsConstructor
+@RequestMapping("/api/propietarios")
 public class PropietarioRestController {
-
-    private final PropietarioService propietarioService;
+    private final PropietarioService propietarios;
 
     @GetMapping
-    public ResponseEntity<List<Propietario>> listarPropietarios(@RequestParam(required = false) String buscar) {
-        List<Propietario> propietarios = propietarioService.buscar(buscar);
-        return ResponseEntity.ok(propietarios);
+    public List<Propietario> listar(@RequestParam(defaultValue = "") String buscar) {
+        return propietarios.buscar(buscar);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> obtenerPorId(@PathVariable Long id) {
-        return propietarioService.obtenerPorId(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public Propietario detalle(@PathVariable Long id) {
+        return propietarios.obtenerPorId(id).orElseThrow(() -> ErroresApi.ausente("Propietario"));
+    }
+
+    private Propietario guardar(Propietario p, Persona datos) {
+        p.setNombres(datos.nombres().trim());
+        p.setApellidos(datos.apellidos().trim());
+        p.setTelefono(datos.telefono().trim());
+        p.setCorreo(datos.correo().trim());
+        return propietarios.guardar(p);
     }
 
     @PostMapping
-    public ResponseEntity<?> guardarPropietario(@RequestBody Propietario propietario) {
-        try {
-            Propietario nuevoPropietario = propietarioService.guardar(propietario);
-            return ResponseEntity.status(HttpStatus.CREATED).body(nuevoPropietario);
-        } catch (IllegalArgumentException e) {
-            Map<String, String> error = new HashMap<>();
-            error.put("mensaje", e.getMessage());
-            return ResponseEntity.badRequest().body(error);
-        }
+    @ResponseStatus(HttpStatus.CREATED)
+    public Propietario crear(@Valid @RequestBody Persona datos) {
+        return guardar(new Propietario(), datos);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> actualizarPropietario(@PathVariable Long id, @RequestBody Propietario propietario) {
-        return propietarioService.obtenerPorId(id).map(existente -> {
-            existente.setNombres(propietario.getNombres());
-            existente.setApellidos(propietario.getApellidos());
-            existente.setTelefono(propietario.getTelefono());
-            existente.setCorreo(propietario.getCorreo());
-            Propietario actualizado = propietarioService.guardar(existente);
-            return ResponseEntity.ok(actualizado);
-        }).orElse(ResponseEntity.notFound().build());
+    public Propietario editar(@PathVariable Long id, @Valid @RequestBody Persona datos) {
+        return guardar(detalle(id), datos);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarPropietario(@PathVariable Long id) {
-        if (propietarioService.obtenerPorId(id).isPresent()) {
-            propietarioService.eliminar(id);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void eliminar(@PathVariable Long id) {
+        detalle(id);
+        propietarios.eliminar(id);
     }
 }

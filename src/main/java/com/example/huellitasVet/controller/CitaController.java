@@ -1,74 +1,68 @@
 package com.example.huellitasVet.controller;
 
-import java.util.List;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import com.example.huellitasVet.model.Cita;
+import com.example.huellitasVet.dto.*;
 import com.example.huellitasVet.service.CitaService;
 
+import jakarta.validation.Valid;
+
+import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.util.List;
+
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/citas")
 public class CitaController {
-
-    private final CitaService citaService;
-
-    public CitaController(CitaService citaService) {
-        this.citaService = citaService;
-    }
+    private final CitaService citas;
 
     @GetMapping
-    public List<Cita> listar() {
-        return citaService.listar();
+    public List<ResumenCita> listar(
+            @RequestParam(required = false) Long mascotaId,
+            @RequestParam(required = false) Long veterinarioId,
+            @RequestParam(required = false) LocalDate fecha,
+            @RequestParam(required = false) String estado,
+            @RequestParam(defaultValue = "") String q) {
+        return citas.buscar(mascotaId, veterinarioId, fecha, estado, q);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Cita> buscar(
-            @PathVariable Long id) {
-
-        Cita cita = citaService.buscarPorId(id);
-
-        if (cita == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        return ResponseEntity.ok(cita);
+    public ResumenCita detalle(@PathVariable Long id) {
+        return citas.detalle(id);
     }
 
     @PostMapping
-    public ResponseEntity<Cita> registrar(
-            @RequestBody Cita cita) {
-
-        Cita nueva = citaService.registrar(cita);
-
-        return ResponseEntity.status(201).body(nueva);
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResumenCita crear(@Valid @RequestBody Solicitudes.Turno datos) {
+        return citas.guardar(null, datos);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Cita> actualizar(
-            @PathVariable Long id,
-            @RequestBody Cita cita) {
-
-        Cita actualizada = citaService.actualizar(id, cita);
-
-        if (actualizada == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        return ResponseEntity.ok(actualizada);
+    public ResumenCita editar(@PathVariable Long id, @Valid @RequestBody Solicitudes.Turno datos) {
+        return citas.guardar(id, datos);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(
-            @PathVariable Long id) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void cancelar(@PathVariable Long id) {
+        citas.cancelar(id);
+    }
 
-        boolean eliminado = citaService.eliminar(id);
-
-        if (!eliminado) {
-            return ResponseEntity.notFound().build();
-        }
-
-        return ResponseEntity.noContent().build();
+    @PostMapping("/{id}/atencion")
+    @ResponseStatus(HttpStatus.CREATED)
+    public FichaClinica atender(
+            @PathVariable Long id,
+            @Valid @RequestBody Solicitudes.Consulta datos,
+            Authentication auth) {
+        return citas.atender(
+                id,
+                datos,
+                auth.getName(),
+                auth.getAuthorities().stream()
+                        .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN")));
     }
 }

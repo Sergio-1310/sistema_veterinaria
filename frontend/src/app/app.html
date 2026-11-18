@@ -1,0 +1,37 @@
+@if (sesion.usuario(); as usuario) {
+<header class="mobile">
+  <button type="button" aria-label="Abrir menú" (click)="menu.set(!menu())"><hv-icono nombre="menu" /></button
+  >HuellitasVet
+</header>
+@if(menu()){<button class="veil" aria-label="Cerrar menú" (click)="menu.set(false)"></button>}
+<aside class="sidebar" [class.abierto]="menu()">
+  <a class="marca" routerLink="/inicio" (click)="menu.set(false)"
+    ><span class="logo"><hv-icono nombre="huella" /></span
+    ><span>HuellitasVet<small>Gestión veterinaria</small></span></a
+  >
+  <nav aria-label="Navegación principal">
+    <a routerLink="/inicio" routerLinkActive="actual" (click)="menu.set(false)"
+      ><hv-icono nombre="inicio" />Inicio</a
+    >
+    @for(item of enlaces; track item.modulo){<a
+      [routerLink]="['/',item.modulo]"
+      routerLinkActive="actual"
+      (click)="menu.set(false)"
+      ><hv-icono [nombre]="item.modulo" />{{item.titulo}}</a
+    >}
+  </nav>
+  <div class="cuenta">
+    <span class="avatar">{{usuario.nombre.charAt(0)}}</span>
+    <div><b>{{usuario.nombre}}</b><small>{{usuario.rol.toLowerCase()}}</small></div>
+    <button
+      class="iconbtn"
+      title="Cerrar sesión"
+      aria-label="Cerrar sesión"
+      (click)="menu.set(false);sesion.salir()"
+    >
+      <hv-icono nombre="salir" />
+    </button>
+  </div>
+</aside>
+}
+<main [class.con-menu]="sesion.usuario()"><router-outlet /></main>
